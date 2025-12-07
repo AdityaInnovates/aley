@@ -19,6 +19,9 @@
   }
 }
 
+button {
+  cursor: pointer;
+}
 input {
   color: black;
 }
