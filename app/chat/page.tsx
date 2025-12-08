@@ -157,8 +157,18 @@ function ChatPageContent() {
       setIsAiTyping(false);
       setError("");
 
-      // Create a temporary ID for the streaming message
-      const tempAiMessageId = `temp-${Date.now()}`;
+      // Create temporary IDs
+      const tempUserMessageId = `temp-user-${Date.now()}`;
+      const tempAiMessageId = `temp-ai-${Date.now()}`;
+
+      // Immediately add user message to UI
+      const userMessage: Message = {
+        id: tempUserMessageId,
+        role: "user",
+        content: message,
+        createdAt: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, userMessage]);
 
       const response = await fetch("/api/chat/send", {
         method: "POST",
@@ -188,10 +198,12 @@ function ChatPageContent() {
         return;
       }
 
-      let userMessageAdded = false;
       let streamingMessageAdded = false;
       let streamedContent = "";
       let newConversationId: string | null = null;
+
+      // Show typing indicator immediately after user message appears
+      setIsAiTyping(true);
 
       while (true) {
         const { done, value } = await reader.read();
@@ -206,19 +218,19 @@ function ChatPageContent() {
               const data = JSON.parse(line.slice(6));
 
               if (data.type === "userMessage") {
-                // Add user message to the list
-                setMessages((prev) => [
-                  ...prev,
-                  {
-                    id: data.data.id,
-                    role: data.data.role,
-                    content: data.data.content,
-                    createdAt: data.data.createdAt,
-                  },
-                ]);
-                userMessageAdded = true;
-                // Show typing indicator after user message
-                setIsAiTyping(true);
+                // Replace temporary user message with the real one from server
+                setMessages((prev) =>
+                  prev.map((msg) =>
+                    msg.id === tempUserMessageId
+                      ? {
+                          id: data.data.id,
+                          role: data.data.role,
+                          content: data.data.content,
+                          createdAt: data.data.createdAt,
+                        }
+                      : msg
+                  )
+                );
               } else if (data.type === "conversationId") {
                 newConversationId = data.data;
               } else if (data.type === "stream") {
@@ -405,7 +417,8 @@ function ChatPageContent() {
                     Start a conversation
                   </h2>
                   <p className="text-slate-500">
-                    Ask Aley anything and she will craft thoughtful responses to keep you moving forward.
+                    Ask Aley anything and she will craft thoughtful responses to
+                    keep you moving forward.
                   </p>
                 </div>
               </div>

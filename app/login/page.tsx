@@ -199,7 +199,7 @@ export default function LoginPage() {
           </div>
 
           {/* Social Login Buttons */}
-          <div className="grid grid-cols-3 gap-3">
+          {/* <div className="grid grid-cols-3 gap-3">
             <button className="py-3 px-4 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl transition-all flex items-center justify-center">
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -236,7 +236,7 @@ export default function LoginPage() {
                 <path fill="#ffb900" d="M12.623 12.623H24V24H12.623z" />
               </svg>
             </button>
-          </div>
+          </div> */}
 
           {/* Terms */}
           <p className="text-xs text-center text-gray-500 mt-8">
